@@ -15,7 +15,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -29,6 +28,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { IdentityX } from "./network";
 
 let FIDO = NativeModules.RNFIDOModule;
@@ -56,6 +56,11 @@ const colors = {
   dangerSoft: "#FFF0F1",
   overlay: "rgba(15, 23, 42, 0.28)",
 };
+
+const safeAreaEdges =
+  Platform.OS === "android"
+    ? ["bottom", "left", "right"]
+    : ["top", "bottom", "left", "right"];
 
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu\n",
@@ -232,7 +237,7 @@ function HomeScreen({ navigation, route }) {
     sdkStatus === "failed" ? "danger" : ready ? "success" : "loading";
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView edges={safeAreaEdges} style={styles.screen}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={styles.homeSafeArea}>
         <ScrollView
@@ -340,7 +345,7 @@ function PasscodeScreen({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView edges={safeAreaEdges} style={styles.screen}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.flex}
@@ -378,12 +383,15 @@ function PasscodeScreen({ navigation, route }) {
           <TextInput
             autoCapitalize="none"
             autoCorrect={false}
-            keyboardType="number-pad"
+            autoComplete="off"
+            keyboardType="default"
             onChangeText={(value) => setText(value)}
             placeholder="Enter passcode"
             placeholderTextColor={colors.subtle}
             secureTextEntry={true}
+            spellCheck={false}
             style={styles.textInput}
+            textContentType="password"
           />
 
           <ActionButton
@@ -453,7 +461,7 @@ function BiometricScreen({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView edges={safeAreaEdges} style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.formContent}
         showsVerticalScrollIndicator={false}
@@ -539,7 +547,7 @@ function SettingsScreen({ navigation, route }) {
   const [facetId] = React.useState(() => FIDO.getFacetId() ?? "Unavailable");
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView edges={safeAreaEdges} style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.formContent}
         showsVerticalScrollIndicator={false}
@@ -715,34 +723,36 @@ function App() {
 
   return (
     <SDKContext.Provider value={{ status: sdkStatus, initialize }}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        >
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Passcode"
-            component={PasscodeScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Biometric"
-            component={BiometricScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          >
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Passcode"
+              component={PasscodeScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Biometric"
+              component={BiometricScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </SDKContext.Provider>
   );
 }
