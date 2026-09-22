@@ -306,6 +306,7 @@ function SettingsScreen({ navigation, route }) {
   const { username } = route.params;
 
   const [isBusy, setBusy] = React.useState(false);
+  const [facetId] = React.useState(() => FIDO.getFacetId() ?? "Unavailable");
 
   return (
     <View style={styles.settings}>
@@ -314,12 +315,16 @@ function SettingsScreen({ navigation, route }) {
       </View>
       <Text>Username:</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, styles.settingsInput]}
         maxLength={40}
         placeholder="username"
         editable={false}
         defaultValue={username}
       />
+      <Text>Facet ID:</Text>
+      <Text selectable={true} style={styles.facetId}>
+        {facetId}
+      </Text>
       <Button
         title="Reset"
         onPress={() => {
@@ -505,6 +510,16 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   input: {
+    marginTop: 5,
+    marginBottom: 25,
+    padding: 5,
+    minWidth: 200,
+    backgroundColor: "#CCCCCC",
+  },
+  settingsInput: {
+    marginBottom: 5,
+  },
+  facetId: {
     marginTop: 5,
     marginBottom: 25,
     padding: 5,

@@ -132,6 +132,11 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(id, deviceIdentifier) {
   return [DaonFIDO deviceId];
 }
 
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(id, getFacetId) {
+  NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+  return bundleIdentifier == nil ? nil : [NSString stringWithFormat:@"ios:bundle-id:%@", bundleIdentifier];
+}
+
 RCT_EXPORT_METHOD(notifyWithResponse:(NSString*)response) {
   [_service performSelector:@selector(notifyHandlerWithResponse:)
                  withObject:response];

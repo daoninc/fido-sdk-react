@@ -356,16 +356,25 @@ public class RNFIDOModule extends ReactContextBaseJavaModule {
             });
         }
 
-        try {
-            Log.i("DAON", "Facet ID: " + UafMessageUtils.getFacetId(getReactApplicationContext()));
-        } catch (Exception e) {
-            Log.w("DAON", "Failed to get Facet ID", e);
-        }
+        String facetId = getFacetId();
+        if (facetId != null)
+            Log.i("DAON", "Facet ID: " + facetId);
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public String deviceIdentifier() {
         return Settings.Secure.getString(getReactApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    @Nullable
+    public String getFacetId() {
+        try {
+            return UafMessageUtils.getFacetId(getReactApplicationContext());
+        } catch (Exception e) {
+            Log.w("DAON", "Failed to get Facet ID", e);
+            return null;
+        }
     }
 
     @ReactMethod
