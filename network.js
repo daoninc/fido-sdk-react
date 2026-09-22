@@ -241,7 +241,11 @@ IdentityX.prototype.notifyServerError = async function (response) {
 };
 
 IdentityX.prototype.notifyRequestError = function (error) {
-  this.fido.notifyWithError(0, error != null ? error.message : "Unknown error", null);
+  this.fido.notifyWithError(
+    0,
+    error != null ? error.message : "Unknown error",
+    null
+  );
 };
 
 IdentityX.prototype.getUser = async function (username) {
@@ -249,7 +253,7 @@ IdentityX.prototype.getUser = async function (username) {
     let response = await this.get(server + users + "?userId=" + username);
 
     if (response.items != undefined) {
-      for (i = 0; i < response.items.length; i++) {
+      for (let i = 0; i < response.items.length; i++) {
         // We do not want an archived user
         if (response.items[i].status == "ACTIVE") return response.items[i];
       }
@@ -283,7 +287,7 @@ IdentityX.prototype.getAuthenticator = async function (aaid, username) {
       if (response != undefined) {
         let deviceId = this.fido.deviceIdentifier();
 
-        for (i = 0; i < response.items.length; i++) {
+        for (let i = 0; i < response.items.length; i++) {
           let authenticator = response.items[i];
 
           if (authenticator.authenticatorAttestationId == aaid) {
@@ -331,7 +335,8 @@ IdentityX.prototype.parseResponse = async function (response) {
       json.httpStatus = response.status;
       if (json.code == undefined) json.code = response.status;
       if (json.developerMessage == undefined)
-        json.developerMessage = response.statusText || "HTTP " + response.status;
+        json.developerMessage =
+          response.statusText || "HTTP " + response.status;
     }
   }
 

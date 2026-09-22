@@ -225,6 +225,14 @@ public class RNFIDOModule extends ReactContextBaseJavaModule {
         return "RNFIDOModule";
     }
 
+    @ReactMethod
+    public void addListener(String eventName) {
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+    }
+
     private boolean isInitialized(Promise promise) {
         if (fido.isInitialised())
             return true;
@@ -322,39 +330,39 @@ public class RNFIDOModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initialize(boolean JSService, final Promise promise) {
 
-        if (fido.isInitialised()) {
-
-            promise.resolve("0");
-
-        } else {
-
-            service = JSService ? new JavaScriptService() : new SimpleService(reactContext);
-
-            Bundle parameters = new Bundle();
-            parameters.putString("com.daon.sdk.log","true");
-            parameters.putString("com.daon.sdk.ados.enabled", "true");
-            parameters.putString("com.daon.sdk.passcode.ados.version", "2"); // SRP
-            parameters.putString("com.daon.sdk.ignoreNativeClients", "true");
-
-            fido.initWithService(parameters, service, new IXUAFInitialiseListener() {
-                @Override
-                public void onInitialiseComplete() {
-                    promise.resolve("0");
-                }
-
-                @Override
-                public void onInitialiseFailed(int code, String message) {
-                    promise.reject(String.valueOf(code), message);
-                }
-
-                @Override
-                public void onInitialiseWarnings(List<Error> list) {
-                    for (Error error : list) {
-                        Log.w("DAON", error.getMessage());
-                    }
-                }
-            });
+        if (fido.isInitialised() && fido.getCurrentFidoOperation() != null) {
+            fido.cancelCurrentOperation();
         }
+
+        service = JSService ? new JavaScriptService() : new SimpleService(reactContext);
+
+        Bundle parameters = new Bundle();
+        parameters.putString("com.daon.sdk.log","true");
+        parameters.putString("com.daon.sdk.ados.enabled", "true");
+        parameters.putString("com.daon.sdk.passcode.ados.version", "2"); // SRP
+        parameters.putString("com.daon.sdk.ignoreNativeClients", "true");
+
+        // Fido is a process-wide singleton. Rebinding the service on every
+        // bridge initialization keeps reloads connected to the current JS
+        // context instead of the context that created the singleton.
+        fido.initWithService(parameters, service, new IXUAFInitialiseListener() {
+            @Override
+            public void onInitialiseComplete() {
+                promise.resolve("0");
+            }
+
+            @Override
+            public void onInitialiseFailed(int code, String message) {
+                promise.reject(String.valueOf(code), message);
+            }
+
+            @Override
+            public void onInitialiseWarnings(List<Error> list) {
+                for (Error error : list) {
+                    Log.w("DAON", error.getMessage());
+                }
+            }
+        });
 
         String facetId = getFacetId();
         if (facetId != null)

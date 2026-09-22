@@ -8,3 +8,8 @@ ios/Pods
 
 node_modules
 
+# Machine/user-specific local overrides
+/android/local.properties
+/ios/.xcode.env.local
+xcuserdata/
+

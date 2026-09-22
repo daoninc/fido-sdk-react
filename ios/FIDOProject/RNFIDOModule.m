@@ -11,7 +11,7 @@
 #import "SimpleService.h"
 
 @interface RNFIDOModule () {
-  
+
   IXUAF * _fido;
 }
 @end
@@ -38,7 +38,7 @@ RCT_EXPORT_MODULE()
 - (BOOL) isInitialized:(RCTPromiseRejectBlock)reject {
   if (_fido != nil && _fido.initialized)
     return YES;
-  
+
   reject([self stringWithCode:IXUAFErrorCodeSdkNotInitialised], @"SDK is not initialised", [IXUAFError errorWithCode:IXUAFErrorCodeSdkNotInitialised]);
   return NO;
 }
@@ -49,7 +49,7 @@ RCT_EXPORT_MODULE()
                      data:(id)data
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject {
-  
+
   if ([self isInitialized:reject]) {
     [_fido registerWithAaid:aaid
                    username:username
@@ -70,7 +70,7 @@ RCT_EXPORT_MODULE()
                   description:(NSString*)description
                      resolver:(RCTPromiseResolveBlock)resolve
                      rejecter:(RCTPromiseRejectBlock)reject {
-  
+
   if ([self isInitialized:reject]) {
     [_fido authenticateWithAaid:aaid
                        username:username
@@ -90,12 +90,12 @@ RCT_EXPORT_MODULE()
                    username:(NSString*)username
                    resolver:(RCTPromiseResolveBlock)resolve
                    rejecter:(RCTPromiseRejectBlock)reject {
-  
+
   if ([self isInitialized:reject]) {
     [_fido deregisterWithAaid:aaid
                      username:username
                       handler:^(NSError *error) {
-      
+
       if (error == nil)
         resolve(@"De-register complete");
       else
@@ -108,18 +108,18 @@ RCT_REMAP_METHOD(initialize,
                  jsservice:(BOOL)js
                  initializeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   if (_fido == nil) {
     _service = js ? [[JavaScriptService alloc] initWithModule:self] : [SimpleService new];
-    
+
     _fido = [[IXUAF alloc] initWithService:_service];
     _fido.logging = YES;
     _fido.delegate = self;
-    
-    NSDictionary * params = @{@"com.daon.sdk.ados.enabled" : @"true"};
-    
+
+    NSDictionary * params = @{@"com.daon.sdk.ados.enabled" : @"true", @"com.daon.sdk.keys.access.biometry" : @"true"};
+
     [_fido initializeWithParameters:params completion:^(IXUAFErrorCode code, NSArray<NSNumber*> *warnings) {
-      
+
       if (code == IXUAFErrorCodeSdkNotInitialised)
         reject([self stringWithCode:code], @"IXUAFErrorCodeSdkNotInitialised", [IXUAFError errorWithCode:code]);
       else
@@ -143,7 +143,7 @@ RCT_EXPORT_METHOD(notifyWithResponse:(NSString*)response) {
 }
 
 RCT_EXPORT_METHOD(notifyWithError:(NSInteger)code message:(NSString*)message response:(NSString*)response) {
-  
+
   if ([_service isKindOfClass:[JavaScriptService class]]) {
     [(JavaScriptService*)_service notifyHandlerWithError:[NSNumber numberWithInteger:code] message:message response:response];
   }
@@ -161,10 +161,10 @@ RCT_EXPORT_METHOD(notifyWithUserNotEnrolledError) {
 RCT_REMAP_METHOD(discover,
                  discoverWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   if ([self isInitialized:reject]) {
     [_fido discoverWithCompletionHandler:^(IXUAFDiscoveryData *response, NSError *error) {
-      
+
       NSMutableArray<NSString*> * authenticators = [NSMutableArray new];
       for (IXUAFAuthenticator * a in response.availableAuthenticators) {
         [authenticators addObject:a.aaid];
@@ -176,10 +176,10 @@ RCT_REMAP_METHOD(discover,
 
 - (NSNumber*) isRegisteredAaid:(NSString*)aaid username:(NSString*)username {
   BOOL registered = NO;
-  
+
   if (_fido != nil && _fido.initialized)
     registered = [_fido isRegisteredAaid:aaid username:username];
-  
+
   return [NSNumber numberWithBool:registered];
 }
 
@@ -200,19 +200,19 @@ RCT_REMAP_METHOD(singleShotAuthenticationRequest,
                  extensions:(NSDictionary*)extensions
                  singleShotAuthenticationRequestWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   NSString *request = [IXUAFMessageWriter authenticationRequestWithApplication:fidoAppID];
   if (request != nil) {
     // if we have a user, make it a stepup.
     if (username != nil)
       request = [IXUAFMessageWriter updateRequest:request username:username];
-    
+
     // Add additional extensions if needed
     if (extensions != nil)
       request = [IXUAFMessageWriter updateRequest:request extensions:extensions];
-    
+
     resolve(request);
-    
+
   } else {
     reject([self stringWithCode:IXUAFErrorCodeProtocolError],
            @"Request is nil",
@@ -224,7 +224,7 @@ RCT_REMAP_METHOD(register,
                  username:(NSString*)username
                  registerWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   if ([self isInitialized:reject]) {
     [_fido registerWithUsername:username handler:^(NSDictionary<NSString *,id> *response, NSError *error) {
       if (error == nil)
@@ -238,7 +238,7 @@ RCT_REMAP_METHOD(register,
 RCT_REMAP_METHOD(authenticate,
                  authenticateWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   if ([self isInitialized:reject]) {
     [_fido authenticateWithCompletionHandler:^(NSDictionary<NSString *,id> *response, NSError *error) {
       if (error == nil)
@@ -254,7 +254,7 @@ RCT_REMAP_METHOD(authenticateWithUsername,
                  description:(NSString*)description
                  authenticateWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   if ([self isInitialized:reject]) {
     [_fido authenticateWithUsername:username description:description handler:^(NSDictionary<NSString *,id> *response, NSError *error) {
       if (error == nil)
@@ -270,7 +270,7 @@ RCT_REMAP_METHOD(deregister,
                  username:(NSString*)username
                  deregisterWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self deregisterWithAaid:aaid username:username resolver:resolve rejecter:reject];
 }
 
@@ -291,7 +291,7 @@ RCT_REMAP_METHOD(registerPasscode,
                  passcode:(NSString*)passcode
                  registerPasscodeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self registerWithAaid:kAAIDPasscode
                 username:username
                     data:passcode
@@ -305,7 +305,7 @@ RCT_REMAP_METHOD(authenticatePasscode,
                  description:(NSString*)description
                  authenticatePasscodeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self authenticateWithAaid:kAAIDPasscode
                     username:username
                         data:passcode
@@ -318,7 +318,7 @@ RCT_REMAP_METHOD(deregisterPasscode,
                  username:(NSString*)username
                  deregisterPasscodeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self deregisterWithAaid:kAAIDPasscode username:username resolver:resolve rejecter:reject];
 }
 
@@ -341,7 +341,7 @@ RCT_REMAP_METHOD(registerDeviceBiometric,
                  username:(NSString*)username
                  registerDeviceBiometricsWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self registerWithAaid:[DASUtils isFaceIDSupported] ? @"D409#2204" : @"D409#2101"
                 username:username
                     data:nil
@@ -354,7 +354,7 @@ RCT_REMAP_METHOD(authenticateDeviceBiometric,
                  description:(NSString*)description
                  authenticateDeviceBiometricsWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self authenticateWithAaid:[DASUtils isFaceIDSupported] ? @"D409#2204" : @"D409#2101"
                     username:username
                         data:nil
@@ -367,7 +367,7 @@ RCT_REMAP_METHOD(deregisterDeviceBiometric,
                  username:(NSString*)username
                  deregisterDeviceBiometricsWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   [self deregisterWithAaid:[DASUtils isFaceIDSupported] ? @"D409#2204" : @"D409#2101"
                   username:username
                   resolver:resolve
@@ -377,17 +377,17 @@ RCT_REMAP_METHOD(deregisterDeviceBiometric,
 RCT_REMAP_METHOD(reset,
                  resetWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  
+
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
     [self->_fido reset];
-    
+
     self->_fido = nil;
-    
+
     dispatch_async( dispatch_get_main_queue(), ^{
       resolve(@"Reset complete");
     });
   });
-  
+
   // reject([self stringWithCode:[error code]], [error localizedDescription], error);
 }
 
@@ -418,27 +418,27 @@ RCT_REMAP_METHOD(reset,
 
 - (void) serviceRequestRegistrationWithParameters:(NSDictionary<NSString *,id> *)params
                                           handler:(void (^)(NSString *, NSDictionary<NSString *,id> *, NSError *))handler {
-  
+
   _handler = handler;
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"request"  forKey:@"type"];
   [body setObject:params[kIXUAFServiceParameterUsername] forKey:@"username"];
-  
+
   [_module sendEventWithName:@"registration" body:body];
 }
 
 - (void) serviceRequestAuthenticationWithParameters:(NSDictionary<NSString *,id> *)params
                                             handler:(void (^)(NSString *, NSDictionary<NSString *,id> *, NSError *))handler {
-  
+
   _handler = handler;
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"request" forKey:@"type"];
-  
+
   if (params != nil)
     [body addEntriesFromDictionary:params];
-  
+
   [_module sendEventWithName:@"authentication" body:body];
 }
 
@@ -446,29 +446,29 @@ RCT_REMAP_METHOD(reset,
 - (void) serviceAuthenticateWithMessage:(NSString *)uafMessage
                              parameters:(NSDictionary<NSString *,id> *)params
                                 handler:(void (^)(NSString *, NSDictionary<NSString *,id> *, NSError *))handler {
-  
+
   _handler = handler;
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"response" forKey:@"type"];
   [body setObject:uafMessage  forKey:@"message"];
   [body setObject:params[kIXUAFServiceParameterRequest] forKey:@"request"];
   [body setObject:params[kIXUAFServiceParameterUsername]    forKey:@"username"];
-  
+
   [_module sendEventWithName:@"authentication" body:body];
 }
 
 - (void) serviceRegisterWithMessage:(NSString *)uafMessage
                          parameters:(NSDictionary<NSString *,id> *)params
                             handler:(void (^)(NSString *, NSDictionary<NSString *,id> *, NSError *))handler {
-  
+
   _handler = handler;
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"response" forKey:@"type"];
   [body setObject:uafMessage  forKey:@"message"];
   [body setObject:params[kIXUAFServiceParameterRequest] forKey:@"request"];
-  
+
   [_module sendEventWithName:@"registration" body:body];
 }
 
@@ -476,17 +476,17 @@ RCT_REMAP_METHOD(reset,
 - (void) serviceRequestDeregistrationWithAaid:(NSString *)aaid
                                    parameters:(NSDictionary<NSString *,id> *)params
                                       handler:(void (^)(NSString *, NSError *))handler {
-  
+
   _handler = ^(NSString *response, NSDictionary *data, NSError *error) {
     handler(response, error);
   };
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"request"  forKey:@"type"];
   [body setObject:aaid        forKey:@"aaid"];
   [body setObject:params[kIXUAFServiceParameterUsername]    forKey:@"username"];
   [body setObject:params[kIXUAFServiceParameterApplication] forKey:@"application"]; // The FIDO application ID, not the IdentityX application
-  
+
   [_module sendEventWithName:@"deregistration" body:body];
 }
 
@@ -495,13 +495,13 @@ RCT_REMAP_METHOD(reset,
                       parameters:(NSDictionary<NSString *,id> *)params
                          handler:(void (^)(NSString *, NSError *))handler {
 
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"attempt" forKey:@"type"];
-  
+
   if (info != nil)
     [body addEntriesFromDictionary:info];
-  
+
   [_module sendEventWithName:@"authentication" body:body];
 }
 
@@ -511,13 +511,13 @@ RCT_REMAP_METHOD(reset,
                          handler:( void (^)(NSString *, NSDictionary<NSString *,id> *, NSError *))handler {
 
   _handler = handler;
-  
+
   NSMutableDictionary * body = [NSMutableDictionary new];
   [body setObject:@"response" forKey:@"type"];
   [body setObject:uafMessage  forKey:@"message"];
   if (username != nil)
     [body setObject:username    forKey:@"username"];
-  
+
   IXUAFMessageReader * mr = [IXUAFMessageReader readerWithMessage:uafMessage];
   if ([mr isRegistration])
     [_module sendEventWithName:@"registration" body:body];
