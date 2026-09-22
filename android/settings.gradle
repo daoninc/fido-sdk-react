@@ -1,0 +1,40 @@
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id("com.facebook.react.settings")
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
+    ex.autolinkLibrariesFromCommand()
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://nexus.identityx-build.com/repository/sdk-maven/" }
+        maven {
+            url "https://maven.pkg.github.com/daoninc/sdk-packages/"
+            credentials {
+                // Do not hardcode credentials here. Set these in your shell
+                // environment (a GitHub PAT with the read:packages scope).
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GPR_TOKEN")
+            }
+        }
+
+    }
+}
+
+rootProject.name = 'FIDOProject'
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')

@@ -1,0 +1,83 @@
+/*
+ Localisations.strings
+ */
+
+
+//////////////////////////////////////////////////////////////////////
+// TRANSACTION CONFIRMATION SCREEN
+//////////////////////////////////////////////////////////////////////
+
+"Transaction Confirmation Screen - Button - Verify" = "Verify";
+"Transaction Confirmation Screen - Button - Cancel" = "Cancel";
+
+//////////////////////////////////////////////////////////////////////
+// CHOOSE ACCOUNT SCREEN
+//////////////////////////////////////////////////////////////////////
+
+"Choose Account Screen - Title" = "Choose Account";
+
+//////////////////////////////////////////////////////////////////////
+// UAF SDK/ERROR MESSAGES
+//////////////////////////////////////////////////////////////////////
+
+"uaf_error_none" = "No error";
+"uaf_error_wait_user_action" = "Waiting on user action to proceed.";
+"uaf_error_insecure_transport" = "Insecure transport mechanism or content.";
+"uaf_error_user_cancelled" = "The user cancelled the action.";
+"uaf_error_unsupported_version" = "Unsupported FIDO version.";
+"uaf_error_no_suitable_authenticator" = "No suitable FIDO authenticator was found.";
+"uaf_error_protocol" = "A violation of the FIDO UAF protocol occurred.";
+"uaf_error_untrusted_facet_id" = "The caller of the UAF client is not trusted.";
+"uaf_error_key_disappeared_permanently" = "The required FIDO authentication key could not be found. If the device Passcode has recently been removed, please deregister and re-register the authenticator.";
+"uaf_error_authenticator_access_denied" = "Authenticator access denied. You may have reached the maximum allowed attempts for this transaction";
+"uaf_error_invalid_transaction_content" = "Invalid FIDO transaction content.";
+"uaf_error_user_not_responsive" = "The user took to long to perform an operation.";
+"uaf_error_insufficient_authenticator_resources" = "Insufficient resources in FIDO authenticator.";
+"uaf_error_user_lockout" = "User is locked.";
+"uaf_error_sdk_not_initialized" = "SDK not initialized.";
+"uaf_error_sdk_already_initialized" = "SDK already initialized.";
+"uaf_error_sdk_no_hardware_keystore" = "Hardware keystore required.";
+"uaf_error_client_not_found" = "No suitable FIDO UAF Client was found.";
+"uaf_error_unexpected" = "An unexpected error occurred.";
+"uaf_error_user_not_enrolled" = "User not enrolled";
+
+"uaf_accounts" = "Choose Account";
+
+"uaf_transaction" = "Confirm";
+"uaf_transaction_accept" = "YES";
+"uaf_transaction_deny" = "NO";
+"uaf_transaction_unknown" = "Unknown content";
+
+//////////////////////////////////////////////////////////////////////
+// MISC ERROR MESSAGES
+//////////////////////////////////////////////////////////////////////
+
+"unhandled_transaction_content_type" = "Unhandled Transaction Content Type: %1$s";
+"nil_transaction_content" = "TransactionContent is nil.";
+"authenticator_operation_failed" = "Authenticator operation failed";
+
+
+//
+// RP Server
+//
+"1"    = "An unexpected server error occurred.  Please see the log files.";
+"1200" = "OK. Operation completed";
+"1202" = "Accepted. Message accepted, but not completed at this time.";
+"1400" = "Bad Request. The server did not understand the message.";
+"1401" = "Unauthorized. The userid must be authenticated to perform this operation, or this KeyID is not associated with this UserID.";
+"1403" = "Forbidden. The userid is not allowed to perform this operation. Client should not retry.";
+"1404" = "Not Found.";
+"1408" = "Request Timeout.";
+"1480" = "Unknown AAID. The server was unable to locate authoritative metadata for the AAID.";
+"1481" = "Unknown KeyID. The server was unable to locate a registration for the given UserID and KeyID combination.";
+"1490" = "Channel Binding Refused. The server refused to service the request due to a missing or mismatched channel binding(s).";
+"1491" = "Request Invalid. The server refused to service the request because the request message nonce was unknown, expired or the server has previously serviced a message with the same nonce and user ID.";
+"1492" = "Unacceptable Authenticator. The authenticator is not acceptable according to the server's policy.";
+"1493" = "Revoked Authenticator. The authenticator is considered revoked by the server.";
+"1494" = "Unacceptable Key. The key used is unacceptable. Perhaps it is on a list of known weak keys or uses insecure parameter choices.";
+"1495" = "Unacceptable Algorithm. The server believes the authenticator to be capable of using a stronger mutually-agreeable algorithm than was presented in the request.";
+"1496" = "Unacceptable Attestation. The attestation(s) provided were not accepted by the server.";
+"1497" = "Unacceptable Client Capabilities. The server was unable or unwilling to use required capabilities provided supplementally to the authenticator by the client software.";
+"1498" = "Unacceptable Content. There was a problem with the contents of the message and the server was unwilling or unable to process it.";
+"1500" = "Internal Server Error";
+
